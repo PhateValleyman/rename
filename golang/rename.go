@@ -27,36 +27,35 @@ func showVersion() {
 	fmt.Printf("%sJonas.Ned@outlook.com%s\n", G, N)
 }
 
-// renameFile renames a file from oldFilename to newFilename.
-// If newFilename already exists, it prompts the user for confirmation before overwriting.
+// Function to rename a file
 func renameFile(oldFilename string, newFilename string, defaultFilename string) error {
-	// If newFilename is empty, set it to defaultFilename
 	if newFilename == "" {
 		newFilename = defaultFilename
 	}
-
-	// Check if newFilename already exists
 	_, err := os.Stat(newFilename)
 	if err == nil {
 		fmt.Printf("\"%s%s%s\"", Y, newFilename, N)
-		fmt.Print(" already exists. Do you want to overwrite it? (y/n): ")
+		fmt.Print(" already exists. Do you want to overwrite/rename/no? (o/r/n): ")
 		reader := bufio.NewReader(os.Stdin)
-		overwrite, _ := reader.ReadString('\n')
-		overwrite = strings.TrimSpace(overwrite)
-		switch strings.ToLower(overwrite) {
-		case "y", "yes":
-			// If user confirms, rename the file
+		option, _ := reader.ReadString('\n')
+		option = strings.TrimSpace(option)
+		switch strings.ToLower(option) {
+		case "o", "overwrite":
 			if err := os.Rename(oldFilename, newFilename); err != nil {
 				fmt.Printf("Failed to rename file \"%s%s%s\"\n", R, oldFilename, N)
 				return err
 			}
 			fmt.Printf("File \"%s%s%s\" renamed to \"%s%s%s\"\n", Y, oldFilename, N, G, newFilename, N)
+		case "r", "rename":
+			fmt.Printf("Enter new name for \"%s%s%s\": ", Y, newFilename, N)
+			newFilename, _ = reader.ReadString('\n')
+			newFilename = strings.TrimSpace(newFilename)
+			return renameFile(oldFilename, newFilename, defaultFilename)
 		default:
-			// If user cancels, abort renaming
 			fmt.Println("Rename aborted...")
+			return nil
 		}
 	} else {
-		// If newFilename doesn't exist, rename the file
 		if err := os.Rename(oldFilename, newFilename); err != nil {
 			fmt.Printf("Failed to rename file \"%s%s%s\"\n", R, oldFilename, N)
 			return err
@@ -66,41 +65,29 @@ func renameFile(oldFilename string, newFilename string, defaultFilename string) 
 	return nil
 }
 
-// processArguments processes the command line arguments passed to the rename command.
-// It validates the arguments, prompts the user for input, and calls renameFile to perform the renaming operation.
+// Function to process command line arguments
 func processArguments(args []string) error {
-	// Check if there are enough arguments
 	if len(args) < 1 {
 		showHelp()
 		return fmt.Errorf("missing arguments")
 	}
-	// Get the old filename from the arguments
 	oldFilename := args[0]
-	// Check if the old filename exists
 	if _, err := os.Stat(oldFilename); err != nil {
 		showHelp()
 		return fmt.Errorf("invalid filename")
 	}
-	// Prompt the user to enter a new filename
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Printf("%sEnter new filename (default: %s): %s", Y, oldFilename, N)
 	newFilename, _ := reader.ReadString('\n')
 	newFilename = strings.TrimSpace(newFilename)
-	// If the new filename is empty, set it to the old filename
-	if newFilename == "" {
-		newFilename = oldFilename
-	}
-	// Call renameFile to perform the renaming operation
 	return renameFile(oldFilename, newFilename, oldFilename)
 }
 
 func main() {
-	// Check if there are enough arguments
 	if len(os.Args) < 2 {
 		showHelp()
 		return
 	}
-	// Process the command specified by the first argument
 	switch os.Args[1] {
 	case "--help", "-h", "-?":
 		showHelp()

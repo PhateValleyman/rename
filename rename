@@ -1,37 +1,36 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
-B="\e[01;34m" # Blue color
-G="\e[32m" # Green color
-R="\e[31m" # Red color
-Y="\e[01;33m" # Yellow color
-N="\e[0m" # Reset colors
+G="\e[32m"
+R="\e[31m"
+Y="\e[01;33m"
+N="\e[0m"
 
-# Function to display usage information
+# Funkce pro zobrazení nápovědy
 show_help() {
-	echo -e "Usage: rename <${Y}filename${N}>"
+	echo -e "Usage: rename <${Y}filename${N}/${Y}s${N}>"
 }
 
-# Function to display version information
+# Funkce pro zobrazení informací o verzi
 show_version() {
-	echo -e "${Y}rename${N} v1.1"
-	echo -e "by ${Y}PhateValleyman${N}"
-	echo -e "${G}Jonas.Ned@outlook.com${N}"
+	echo "rename v1.1"
+	echo "by PhateValleyman"
+	echo "Jonas.Ned@outlook.com"
 }
 
-# Function to rename a file
+# Funkce pro přejmenování souboru
 rename_file() {
 	local old_filename="$1"
 	local new_filename="$2"
 
 	if [ -e "$new_filename" ]; then
-		echo -e "\"${Y}${new_filename}${N}\""
+		echo -e "\"\e[01;33m$new_filename\e[0m\""
 		read -p "already exists. Do you want to overwrite it? (y/n): " overwrite
 		case "$overwrite" in
 			[Yy]*)
 				if mv -f -- "$old_filename" "$new_filename"; then
-					echo -e "File \"${Y}${old_filename}${N}\" renamed to \"${G}${new_filename}${N}\""
+					echo -e "File \"${Y}$old_filename${N}\" renamed to \"${G}$new_filename${N}\""
 				else
-					echo -e "Failed to rename file \"${R}${old_filename}${N}\""
+					echo -e "Failed to rename file \"${R}$old_filename${N}\""
 					return 1
 				fi
 				;;
@@ -42,15 +41,15 @@ rename_file() {
 		esac
 	else
 		if mv -f -- "$old_filename" "$new_filename"; then
-			echo -e "File \"${Y}${old_filename}${N}\" renamed to \"${G}${new_filename}${N}\""
+			echo -e "File \"${Y}$old_filename${N}\" renamed to \"${G}$new_filename${N}\""
 		else
-			echo -e "Failed to rename file \"${R}${old_filename}${N}\""
+			echo -e "Failed to rename file \"${R}$old_filename${N}\""
 			return 1
 		fi
 	fi
 }
 
-# Function to process command line arguments
+# Funkce pro zpracování argumentů příkazové řádky
 process_arguments() {
 	case "$1" in
 		--help | -h | -?)
@@ -72,5 +71,5 @@ process_arguments() {
 	esac
 }
 
-# Call the function to process command line arguments
+# Volání funkce pro zpracování argumentů příkazové řádky
 process_arguments "$@"
